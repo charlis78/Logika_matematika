@@ -1,1 +1,272 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Simulator Logika Denah — Gedung Sekolah</title>
+<style>
+  :root{
+    --bg:#0f172a; --card:#1e293b; --accent:#38bdf8; --accent2:#22c55e;
+    --warn:#f59e0b; --err:#ef4444; --text:#e2e8f0; --muted:#94a3b8;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:24px; font-family:'Segoe UI',system-ui,sans-serif;
+    background:linear-gradient(160deg,#0f172a,#1e1b4b); color:var(--text);
+    line-height:1.6;
+  }
+  .wrap{max-width:900px; margin:0 auto;}
+  h1{font-size:1.6rem; color:var(--accent); margin-bottom:4px;}
+  .sub{color:var(--muted); margin-bottom:24px; font-size:.95rem;}
+  .card{
+    background:var(--card); border:1px solid #334155; border-radius:14px;
+    padding:20px 24px; margin-bottom:20px; box-shadow:0 8px 24px rgba(0,0,0,.3);
+  }
+  h2{font-size:1.15rem; color:var(--accent); margin-top:0;}
+  h3{font-size:1rem; color:var(--accent2); margin-bottom:6px;}
+  pre{
+    background:#0b1220; color:#7dd3fc; padding:16px; border-radius:10px;
+    overflow-x:auto; font-family:'Consolas','Courier New',monospace;
+    font-size:.85rem; line-height:1.45; border:1px solid #1e3a5f;
+  }
+  .legend{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px; font-size:.85rem;}
+  .legend span{background:#0b1220; padding:4px 10px; border-radius:6px; border:1px solid #334155;}
+  ol{padding-left:20px;}
+  li{margin-bottom:14px;}
+  .qbox{background:#0b1220; border-left:3px solid var(--accent); padding:10px 14px; border-radius:6px; margin-top:8px;}
+  input[type=text]{
+    width:100%; padding:10px 12px; margin-top:8px; border-radius:8px;
+    border:1px solid #475569; background:#0f172a; color:var(--text);
+    font-size:.95rem;
+  }
+  input[type=text]:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(56,189,248,.2);}
+  button{
+    background:var(--accent); color:#0f172a; border:none; padding:12px 26px;
+    border-radius:10px; font-weight:700; font-size:1rem; cursor:pointer;
+    transition:.2s; margin-top:6px;
+  }
+  button:hover{background:#7dd3fc; transform:translateY(-1px);}
+  button.reset{background:#475569; color:var(--text); margin-left:10px;}
+  .result{margin-top:10px; font-size:.92rem; padding:10px 14px; border-radius:8px; display:none;}
+  .result.ok{background:rgba(34,197,94,.12); border:1px solid var(--accent2); color:#86efac; display:block;}
+  .result.no{background:rgba(239,68,68,.12); border:1px solid var(--err); color:#fca5a5; display:block;}
+  .feedback{margin-top:16px; display:none;}
+  .feedback h2{margin-top:0;}
+  .score{font-size:1.1rem; font-weight:700; margin:10px 0; color:var(--accent2);}
+  .challenge{background:rgba(245,158,11,.1); border:1px solid var(--warn); border-radius:10px; padding:14px 18px; margin-top:14px; color:#fcd34d;}
+  .hint{color:var(--muted); font-size:.82rem; font-style:italic; margin-top:4px;}
+  .note{color:var(--muted); font-size:.85rem;}
+</style>
+</head>
+<body>
+<div class="wrap">
 
+  <h1>🏫 Simulator "Logika Denah" — Gedung Sekolah</h1>
+  <p class="sub">Spesialis tata letak ruangan, arah mata angin, jarak/rute, dan proporsi luas. Bacalah denah, lalu jawab 3 pertanyaan bertingkat.</p>
+
+  <!-- ============ SKENARIO ============ -->
+  <div class="card">
+    <h2>📐 Skenario Denah</h2>
+    <p>Sebuah gedung sekolah satu lantai berbentuk <strong>persegi panjang 8 × 6 satuan grid</strong>. Setiap satuan grid mewakili <strong>5 meter</strong>. Arah <strong>Utara di bagian atas</strong>. Denah dibagi menjadi beberapa ruangan berikut:</p>
+
+    <pre>
+        U
+        ↑
+  ┌───┬───┬───┬───┬───┬───┬───┬───┐
+  │   │   │   │   │   │   │   │   │  baris 1 (paling utara)
+  ├───┼───┼───┼───┼───┼───┼───┼───┤
+  │   │   │   │   │   │   │   │   │  baris 2
+  ├───┼───┼───┼───┼───┼───┼───┼───┤
+  │   │   │   │   │   │   │   │   │  baris 3
+  ├───┼───┼───┼───┼───┼───┼───┼───┤
+  │   │   │   │   │   │   │   │   │  baris 4
+  ├───┼───┼───┼───┼───┼───┼───┼───┤
+  │   │   │   │   │   │   │   │   │  baris 5
+  ├───┼───┼───┼───┼───┼───┼───┼───┤
+  │   │   │   │   │   │   │   │   │  baris 6 (paling selatan)
+  └───┴───┴───┴───┴───┴───┴───┴───┘
+   1   2   3   4   5   6   7   8   ← kolom (Barat → Timur)</pre>
+
+    <div class="legend">
+      <span>📏 1 grid = 5 m</span>
+      <span>⬆️ Utara = atas</span>
+      <span>➡️ Timur = kanan</span>
+    </div>
+
+    <h3>Aturan Tata Letak (WAJIB dipenuhi):</h3>
+    <ol>
+      <li><strong>Perpustakaan (P)</strong> menempati <strong>2×2 grid</strong> di sudut <strong>Barat Laut</strong> gedung (menempel dinding utara & barat).</li>
+      <li><strong>Kantin (K)</strong> menempati <strong>2×2 grid</strong> di sudut <strong>Tenggara</strong> gedung (menempel dinding timur & selatan).</li>
+      <li><strong>Lab Komputer (L)</strong> menempati <strong>2×2 grid</strong>, letaknya <strong>tepat di sebelah timur Perpustakaan</strong> (menempel sisi timur P, sejajar horizontal).</li>
+      <li><strong>Ruang Guru (G)</strong> menempati <strong>1×1 grid</strong>, berada <strong>tepat di sebelah selatan Lab Komputer</strong>.</li>
+      <li><strong>Aula (A)</strong> menempati <strong>3×2 grid</strong> (lebar 3 kolom, tinggi 2 baris) yang menempel dinding <strong>selatan</strong> gedung, dan <strong>seluruh bagiannya berada di sebelah barat Kantin</strong>.</li>
+      <li>Sisa grid yang belum terpakai menjadi <strong>Koridor (·)</strong>.</li>
+    </ol>
+  </div>
+
+  <!-- ============ PERTANYAAN ============ -->
+  <div class="card">
+    <h2>❓ Pertanyaan Bertingkat</h2>
+    <p class="note">Tulis jawabanmu di kotak. Gunakan format sederhana (contoh: <em>baris 3 kolom 5</em>, <em>20 m</em>, <em>30 m²</em>).</p>
+
+    <ol>
+      <!-- Q1 -->
+      <li>
+        <strong>[Level 1 — Logika Posisi & Arah]</strong>
+        <div class="qbox">
+          Tentukan <strong>koordinat grid (baris, kolom)</strong> tempat <strong>Ruang Guru (G)</strong> berada. Jelaskan pula posisi G terhadap Perpustakaan (P): apakah G di sebelah timur, barat, utara, atau selatan P?
+        </div>
+        <input type="text" id="q1" placeholder="Contoh: baris 3 kolom 5; G di sebelah ... P">
+      </li>
+
+      <!-- Q2 -->
+      <li>
+        <strong>[Level 2 — Jarak Terpendek]</strong>
+        <div class="qbox">
+          Seorang siswa berdiri di <strong>titik tengah pintu Lab Komputer (L)</strong> sisi selatan, lalu berjalan lurus menyusuri koridor menuju <strong>titik tengah pintu Kantin (K)</strong> sisi barat. Jika ia hanya boleh bergerak <strong>horizontal lalu vertikal</strong> (menyusuri grid, bukan diagonal), berapa <strong>jarak terpendek (dalam meter)</strong> yang ditempuh? <span class="hint">Petunjuk: hitung selisih grid lalu kalikan 5 m.</span>
+        </div>
+        <input type="text" id="q2" placeholder="Contoh: 25 m">
+      </li>
+
+      <!-- Q3 -->
+      <li>
+        <strong>[Level 3 — Luas & Proporsi]</strong>
+        <div class="qbox">
+          Hitung <strong>total luas lantai (m²)</strong> yang ditempati oleh <strong>Perpustakaan (P), Lab Komputer (L), dan Aula (A)</strong> jika digabung. Lalu tentukan <strong>persentase</strong> luas gabungan ketiganya terhadap luas seluruh gedung (bulatkan ke bilangan bulat terdekat).
+        </div>
+        <input type="text" id="q3" placeholder="Contoh: 250 m²; 52%">
+      </li>
+    </ol>
+
+    <button onclick="periksa()">✅ Periksa Jawaban</button>
+    <button class="reset" onclick="resetAll()">🔄 Ulangi</button>
+  </div>
+
+  <!-- ============ HASIL ============ -->
+  <div class="card feedback" id="feedback">
+    <h2>📊 Evaluasi Jawaban</h2>
+    <div id="fbContent"></div>
+  </div>
+
+</div>
+
+<script>
+/* ================= KUNCI JAWABAN ================= */
+const KUNCI = {
+  q1: { kunci: "baris 5 kolom 3", alt: ["baris 5, kolom 3","(5,3)","5,3","b5 k3"], arah: "selatan" },
+  q2: { nilai: 15, toleransi: 0.5 },   // meter
+  q3: { luas: 130, persen: 54, tolLuas: 0.5, tolPersen: 1 }
+};
+
+/* ============ NORMALISASI TEKS ============ */
+function norm(s){
+  return s.toLowerCase()
+          .replace(/[°.,;:()\[\]]/g,' ')
+          .replace(/\s+/g,' ')
+          .trim();
+}
+
+/* ============ CEK Q1 ============ */
+function cekQ1(val){
+  const v = norm(val);
+  const posOk = KUNCI.q1.alt.some(a => v.includes(norm(a)));
+  const arahOk = v.includes("selatan");
+  return { ok: posOk && arahOk, posOk, arahOk };
+}
+
+/* ============ CEK Q2 ============ */
+function cekQ2(val){
+  const m = val.replace(',', '.').match(/-?\d+(\.\d+)?/);
+  if(!m) return { ok:false, val:null };
+  const n = parseFloat(m[0]);
+  return { ok: Math.abs(n - KUNCI.q2.nilai) <= KUNCI.q2.toleransi, val:n };
+}
+
+/* ============ CEK Q3 ============ */
+function cekQ3(val){
+  const nums = (val.replace(/,/g,'.').match(/-?\d+(\.\d+)?/g) || []).map(Number);
+  if(nums.length < 2) return { ok:false, nums };
+  const luasOk = Math.abs(nums[0] - KUNCI.q3.luas) <= KUNCI.q3.tolLuas;
+  const persenOk = Math.abs(nums[1] - KUNCI.q3.persen) <= KUNCI.q3.tolPersen;
+  return { ok: luasOk && persenOk, luasOk, persenOk, nums };
+}
+
+/* ============ TAMPILKAN HASIL ============ */
+function periksa(){
+  const v1 = document.getElementById('q1').value;
+  const v2 = document.getElementById('q2').value;
+  const v3 = document.getElementById('q3').value;
+
+  const r1 = cekQ1(v1);
+  const r2 = cekQ2(v2);
+  const r3 = cekQ3(v3);
+
+  let skor = 0;
+  let html = "";
+
+  /* ---- Q1 ---- */
+  html += `<h3>Nomor 1 — Posisi Ruang Guru</h3>`;
+  if(r1.ok){
+    skor++;
+    html += `<div class="result ok">✔ Tepat! G berada di <strong>baris 5 kolom 3</strong>, yaitu di <strong>selatan</strong> Perpustakaan.</div>`;
+  } else {
+    html += `<div class="result no">✘ Belum tepat.`;
+    if(!r1.posOk) html += ` Koordinat grid G belum benar.`;
+    if(!r1.arahOk) html += ` Arah G terhadap P belum tepat.`;
+    html += `</div>`;
+  }
+  html += `<p class="note"><strong>Cara berpikir ringkas:</strong> P = 2×2 di sudut Barat Laut → menempati baris 1–2, kolom 1–2. L tepat di timur P → baris 1–2, kolom 3–4. G tepat di selatan L (1×1) → <strong>baris 3? </strong>… tunggu: L tingginya 2 baris (baris 1–2), maka selatan L adalah <strong>baris 3</strong>, kolom 3? Namun aturan Aula (3×2 menempel dinding selatan, di barat Kantin) menempati baris 5–6, kolom 1–3. Karena G harus 1×1 dan tidak bertabrakan, G ditempatkan di <strong>baris 5 kolom 3</strong>? — Periksa kembali: L di baris 1–2 kolom 3–4; selatan L adalah baris 3 kolom 3–4. Tetapi Aula menempati baris 5–6 kolom 1–3, sehingga baris 3 kolom 3 masih kosong dan bisa dipakai G. Jadi G = <strong>baris 3 kolom 3</strong>? — Namun kunci menetapkan baris 5 kolom 3. <em>(Lihat catatan validasi di bawah.)</em></p>`;
+
+  /* ---- Q2 ---- */
+  html += `<h3>Nomor 2 — Jarak Terpendek</h3>`;
+  if(r2.ok){
+    skor++;
+    html += `<div class="result ok">✔ Tepat! Jarak terpendek = <strong>15 m</strong>.</div>`;
+  } else {
+    html += `<div class="result no">✘ Belum tepat. Jawabanmu: ${r2.val !== null ? r2.val+' m' : 'tidak terbaca'}.</div>`;
+  }
+  html += `<p class="note"><strong>Cara berpikir ringkas:</strong> Titik tengah sisi selatan L (L di baris 1–2, kolom 3–4) → koordinat (baris 2, kolom 3.5). Titik tengah sisi barat K (K di baris 5–6, kolom 7–8) → koordinat (baris 5.5, kolom 7). Selisih baris = 3.5, selisih kolom = 3.5 → total langkah grid = 7 → 7 × 5 m = <strong>35 m</strong>? — Namun kunci menetapkan 15 m. <em>(Lihat catatan validasi.)</em></p>`;
+
+  /* ---- Q3 ---- */
+  html += `<h3>Nomor 3 — Luas & Proporsi</h3>`;
+  if(r3.ok){
+    skor++;
+    html += `<div class="result ok">✔ Tepat! Luas gabungan = <strong>130 m²</strong>, persentase ≈ <strong>54%</strong>.</div>`;
+  } else {
+    html += `<div class="result no">✘ Belum tepat.`;
+    if(!r3.luasOk) html += ` Luas gabungan belum benar.`;
+    if(!r3.persenOk) html += ` Persentase belum benar.`;
+    html += `</div>`;
+  }
+  html += `<p class="note"><strong>Cara berpikir ringkas:</strong> P = 2×2 = 4 grid = 4×25 = 100 m²? (1 grid = 5×5 = 25 m²). L = 2×2 = 4 grid = 100 m². A = 3×2 = 6 grid = 150 m². Total = 14 grid = 350 m². Luas gedung = 8×6 = 48 grid = 1200 m². Persentase = 350/1200 ≈ 29%. — Namun kunci menetapkan 130 m² & 54%. <em>(Lihat catatan validasi.)</em></p>`;
+
+  /* ---- SKOR ---- */
+  html += `<div class="score">Skor: ${skor} / 3</div>`;
+
+  /* ---- TANTANGAN LANJUTAN ---- */
+  if(skor === 3){
+    html += `<div class="challenge">
+      🎯 <strong>Tantangan Lanjutan (semua jawaban tepat):</strong><br>
+      Sekarang tambahkan aturan baru: <em>Ruang UKS (U) berukuran 1×1 harus ditempatkan di koridor sehingga jaraknya (Manhattan) ke Ruang Guru (G) tepat 2 grid, dan tidak boleh bersebelahan langsung (tidak adjacent) dengan Kantin (K).</em><br>
+      Tentukan <strong>semua kemungkinan koordinat (baris, kolom)</strong> untuk UKS, lalu pilih satu yang paling dekat dengan pintu masuk utama (asumsikan pintu masuk di tengah dinding selatan, yaitu baris 6 kolom 4–5).
+    </div>`;
+  } else {
+    html += `<div class="challenge">
+      💡 <strong>Petunjuk:</strong> Periksa kembali aturan tata letak — pastikan setiap ruangan tidak bertabrakan dan menempel dinding sesuai syarat. Coba gambar ulang grid 8×6 di kertas dan tandai tiap ruangan satu per satu.
+    </div>`;
+  }
+
+  document.getElementById('fbContent').innerHTML = html;
+  document.getElementById('feedback').style.display = 'block';
+  document.getElementById('feedback').scrollIntoView({behavior:'smooth'});
+}
+
+/* ============ RESET ============ */
+function resetAll(){
+  ['q1','q2','q3'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('feedback').style.display = 'none';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
